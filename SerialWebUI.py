@@ -20,14 +20,14 @@ def handleIncremental():
     cts = request.form['cts']
     incAngle = request.form['incAngle']
     stopAngle = request.form['stopAngle']
-    updateServo(dir, cts, incAngle, stopAngle)
+    updateServoIncremental(dir, cts, incAngle, stopAngle)
     return render_template('mdrive.html')
 
 ## Specific form submission
 @app.route('/handleSpecific', methods=['POST'])
 def handleSpecific():
     nextAngle = request.form['angle']
-    updateServo(nextAngle)
+    updateServoSpecific(nextAngle)
     return render_template('mdrive.html')
 
 ## Automatically run in debug mode
@@ -39,7 +39,7 @@ import serial
 import io
 
 ## Update M Drive servo with specific anglew
-def updateServo(nextAngle):
+def updateServoSpecific(nextAngle):
     ## Create serial connection with servo
     ser = serial.Serial()
     ser.baudrate = 9600
@@ -51,4 +51,12 @@ def updateServo(nextAngle):
     serIO.write(nextAngle * (51200 / 360))
     serIO.write("\n")
     serIO.flush()
+    ser.close()
+
+def updateServoIncremental(dir, cts, incAngle, stopAngle):
+    ## Create serial connection with servo
+    ser = serial.Serial()
+    ser.baudrate = 9600
+    ser.port = 'COM8'
+    ser.open()
     ser.close()

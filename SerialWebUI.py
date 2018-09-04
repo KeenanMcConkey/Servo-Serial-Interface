@@ -88,7 +88,7 @@ def updateServoIncremental(dir, cts, incAngle, stopAngle):
 def checkServoLimits(incAngle):
     testAngle = servoAngle + incAngle
 
-    if (testAngle > 0.0 and testAngle > 600.0):
+    if (testAngle > 0.0 and testAngle < 600.0):
         return true
     else:
         return false

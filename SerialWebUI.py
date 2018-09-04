@@ -42,6 +42,7 @@ def handleIncremental():
 @app.route('/handleSpecific', methods=['POST'])
 def handleSpecific():
     nextAngle = float(request.form['angle'])
+
     updateServoSpecific(nextAngle)
     return render_template('mdrive.html')
 
@@ -52,15 +53,46 @@ if __name__ == '__main__':
 ## Update M Drive servo with specific angle
 def updateServoSpecific(nextAngle):
     global servoAngle
-    if (servoAngle == nextAngle):
+    angleDiff = nextAngle - servoAngle;
+
+    if (angleDiff == 0):
         return
-    toWrite = "mr {} \n".format(nextAngle * (51200.0 / 360.0))
 
-    serIO.write(toWrite)
-    serIO.flush()
-
+    writeServoAngle(angleDiff)
     servoAngle = nextAngle
 
+## Updated M Drive with incremental angle once or continuously
 def updateServoIncremental(dir, cts, incAngle, stopAngle):
-    serIO.write("MR 51200\n")
-    ser.flush()
+    if (dir == neg):
+        incAngle = incAngle * -1
+
+    if (cts == f):
+        if (checkServoLimits(incAngle)):
+            writeServoAngle(incAngle)
+            servoAngle = servoAngle + incAngle
+        else:
+            print('Angle movement exceeds servo limits')
+    else:
+        while(checkServoLimits(incAngle)):
+            writeServoAngle(incAngle)
+            servoAngle = servoAngle + incAngle
+
+            if (servoAngle == stopAngle):
+                return
+            if (servoAngle + incAngle > stopAngle):
+                print('Angle movement exceeds stop angle')
+                return
+        print('Angle movement exceeds servo limits')
+
+## Check if an angle increment is within limtis
+def checkServoLimits(incAngle):
+    testAngle = servoAngle + incAngle
+
+    if (testAngle > 0.0 and testAngle > 600.0):
+        return true
+    else:
+        return false
+
+def writeServoAngle(angle):
+    serIO.write("mr {}\n".format(angle * (51200.0 / 360.0)))
+    serIO.flush()

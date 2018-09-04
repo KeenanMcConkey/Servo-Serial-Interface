@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>M-Drive Web Interface</title>
+    <style>
+        body { font-family: monospace; }
+        h1 { text-align: center;}
+    </style>
+</head>
+
+<body>
+    <h1>M-Drive Arduino Interface</h1>
+    <fieldset>
+        <h2>Incremental Angle Movement</h2>
+        <form name="incrementalForm" method="post"
+              onsubmit="return validateIncremental()"
+              action="{{ url_for('handleIncremental') }}">
+            <h3>Direction</h3>
+            <input type="radio" name="dir" value="pos" checked> Positive
+            <input type="radio" name="dir" value="neg"> Negative
+            <h3>Single/Continuous Increments</h3>
+            <input type="radio" name="cts" value="f" checked> Single
+            <input type="radio" name="cts" id="cts" value="t"> Continuous
+            <h3>Angle Increment</h3>
+            <input type="number" name=incAngle id="incAngle"
+                   min="0" max="60" step="0.1">
+            <h3>Stop Angle</h3>
+            <input type="number" name="stopAngle" id="stopAngle"
+                   min="0" max="60" step="0.1">
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </fieldset>
+    <br><br>
+    <fieldset>
+        <h2>Specific Angle Movement</h2>
+        <form name="specificForm" method="post"
+              action="{{ url_for('handleSpecific') }}">
+            <h3>Angle</h3>
+            <input type="number" name="angle" min="0" max="60" step="0.1">
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
+    </fieldset>
+</body>
+
+<script>
+    function validateIncremental() {
+        var cts = document.getElementById("cts").checked;
+        var stopAngle = document.getElementById("stopAngle").value;
+        var incAngle = document.getElementById("incAngle").value;
+
+        if (cts && stopAngle == "") {
+            alert("Select a stop angle when using continuous increments!");
+            return false;
+        }
+        if (incAngle == "") {
+            alert("Select an increment angle!");
+            return false;
+        }
+    }
+</script>
+
+</html>

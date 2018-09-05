@@ -2,6 +2,8 @@
 
 ### Interface for Serial Control of M Drive Servo Motor
 
+---
+
 ### Libraries
 
 #### PySerial
@@ -50,5 +52,7 @@ Add **servo feedback** for continuous movement
 Serial currently not working properly on Mac
 
 Continuous movement not working due to no feedback
+
+---
 
 *Created by Keenan McConkey*

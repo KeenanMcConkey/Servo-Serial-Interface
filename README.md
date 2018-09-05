@@ -49,9 +49,7 @@ Add **servo feedback** for continuous movement
 
 ### Issues
 
-Serial currently not working properly on Mac
-
-Continuous movement not working due to no feedback
+Continuous movement not working due to missing feedback
 
 ---
 

@@ -54,7 +54,7 @@ def handleIncremental():
         cts = True
     else:
         cts = False
-    
+
     incAngle = float(request.form['incAngle'])
     stopAngle = request.form['stopAngle']
 
@@ -117,7 +117,7 @@ def checkServoLimits(incAngle):
 ## Write an angle to the servo via premade serial connection
 def writeServoAngle(angle):
     ## Move relative
-    toWrite = 'mr {}\n'.format(int(angle * 51200.0 / 360.0))
+    toWrite = 'mr {}\r\n'.format(int(angle * 51200.0 / 360.0))
     ## Servo only accepts UTF-8 encoding
     toWrite.encode(encoding='UTF-8')
 

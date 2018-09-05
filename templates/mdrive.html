@@ -1,51 +1,62 @@
 <!DOCTYPE html>
 <html>
 
+<!--Internal CSS Style-->
 <head>
     <title>M-Drive Web Interface</title>
     <style>
-        body { font-family: monospace; }
-        h1 { text-align: center;}
+        body { font-family: Calibri; font-size: 75%; color: #303030;
+                text-shadow: 2px 2px 5px #DDDDDD; background-color: #FFFFFF}
+        h1 { text-align: center; }
+        fieldset { box-shadow: 5px 5px 10px #AAAAAA; border-style: none;
+                    background-color: #FFFFFF}
+        p {text-align: center; }
     </style>
 </head>
 
-<!--M Drive web interface-->
+<!--Form Interface-->
 <body>
-    <h1>M-Drive Arduino Interface</h1>
+    <h1>M-Drive Web Interface</h1>
+    <p><b>Current Angle</b> = {{currAngle}}<br></p>
     <fieldset>
         <h2>Incremental Angle Movement</h2>
         <form name="incrementalForm" method="post"
               onsubmit="return validateIncremental()"
               action="{{ url_for('handleIncremental') }}">
-            <h3>Angle Increment</h3>
+            <h3>Angle Increment (-90° to 90°):</h3>
                 <input type="number" name=incAngle id="incAngle"
-                        min="-90" max="90" step="0.1">
-            <h3>Single/Continuous Increments</h3>
+                        value="0.00" min="-90" max="90" step="0.01">
+            <h3>Single/Continuous Increments:</h3>
                 <input type="radio" name="cts" value="f" checked> Single
                 <input type="radio" name="cts" id="cts" value="t"> Continuous
-            <h3>Stop Angle</h3>
+            <h3>Stop Angle (-90° to 90°):</h3>
                 <input type="number" name="stopAngle" id="stopAngle"
-                        min="-90" max="90" step="0.1">
-            <br><br>
+                        value="0.00" min="-90" max="90" step="0.01">
+            <h3> Delay (s):<h3>
+                <input type="number" name="delay" value="0.000"
+                        value="0.00" min="0" max="1000" step="0.001">
+                <br><br>
                 <input type="submit" value="Submit">
+                <br><br>
         </form>
     </fieldset>
-    <br><br>
+    <br>
     <fieldset>
         <h2>Specific Angle Movement</h2>
         <form name="specificForm" method="post"
               onsubmit="return validateSpecific()"
               action="{{ url_for('handleSpecific') }}">
-            <h3>Angle</h3>
-                <input type="number" name="angle" id="angle"
-                        min="-90" max="90" step="0.1">
+            <h3>Angle (-90° to 90°):</h3>
+                <input type="number" name="angle" id="angle" value="0.00"
+                        min="-90" max="90" step="0.01">
             <br><br>
                 <input type="submit" value="Submit">
+            <br><br>
         </form>
     </fieldset>
 </body>
 
-<!--Validate with javascript-->
+<!--Javascript Valdator-->
 <script src="{{ url_for('static', filename='validate.js') }}"></script>
 
 </html>

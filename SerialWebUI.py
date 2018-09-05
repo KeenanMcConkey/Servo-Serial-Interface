@@ -15,17 +15,27 @@ elif (os == 'Linux'):
     port = '/dev/ttysUSB0'
 else:
     port = ''
-    print('Error: Unknown OS')
+    print('Invalid OS!')
 
 # Create serial connection with Servo using PySerial
 import serial
 import io
 
-ser = serial.Serial(port)
-print(" * Port: {}".format(ser.port))
-print(" * Baudrate: {}".format(ser.baudrate))
+try:
+    ser = serial.Serial()
+    ser.port = port
+    ser.baudrate = 9600
+    ser.open()
+except SerialException:
+    print('SerialError: Could not connect to serial port')
+
+print(' * Port: {}'.format(ser.port))
+print(' * Baudrate: {}'.format(ser.baudrate))
+
+# Create IO wrapper that encodes text to bytes
 serIO = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
-serIO.write("fd") ## Reset servo to factory def
+serIO.write('fd\n') ## Reset servo to factory defaults
+serIO.flush()
 
 # Create a web interface to take data from using Flask
 from flask import Flask, render_template, request, url_for
@@ -39,17 +49,19 @@ def index():
 ## Incremental form submission
 @app.route('/handleIncremental', methods=['POST'])
 def handleIncremental():
-    dir = request.form['dir']
     cts = request.form['cts']
-    incAngle = request.form['incAngle']
+    if (cts == 't'):
+        cts = True
+    else:
+        cts = False
+    
+    incAngle = float(request.form['incAngle'])
     stopAngle = request.form['stopAngle']
 
-    if (incAngle != ""):
-        incAngle = float(incAngle)
     if (stopAngle != ""):
         stopAngle = float(stopAngle)
 
-    updateServoIncremental(dir, cts, incAngle, stopAngle)
+    updateServoIncremental(cts, incAngle, stopAngle)
     return render_template('mdrive.html')
 
 ## Specific form submission
@@ -60,33 +72,22 @@ def handleSpecific():
     updateServoSpecific(nextAngle)
     return render_template('mdrive.html')
 
-## Automatically run in debug mode
-if __name__ == '__main__':
-    app.run(debug = True)
-
 ## Update M Drive servo with specific angle
 def updateServoSpecific(nextAngle):
     global servoAngle
     angleDiff = nextAngle - servoAngle;
 
-    if (angleDiff == 0):
+    if (angleDiff == 0.0):
         return
 
     writeServoAngle(angleDiff)
     servoAngle = nextAngle
 
 ## Updated M Drive with incremental angle once or continuously
-def updateServoIncremental(dir, cts, incAngle, stopAngle):
-    if (dir == neg):
-        incAngle = incAngle * -1
+def updateServoIncremental(cts, incAngle, stopAngle):
+    global servoAngle
 
-    if (cts == f):
-        if (checkServoLimits(incAngle)):
-            writeServoAngle(incAngle)
-            servoAngle = servoAngle + incAngle
-        else:
-            print('Angle movement exceeds servo limits')
-    else:
+    if (cts): # Algorithm for continous incremental movement
         while(checkServoLimits(incAngle)):
             writeServoAngle(incAngle)
             servoAngle = servoAngle + incAngle
@@ -94,21 +95,31 @@ def updateServoIncremental(dir, cts, incAngle, stopAngle):
             if (servoAngle == stopAngle):
                 return
             if (servoAngle + incAngle > stopAngle):
-                print('Angle movement exceeds stop angle')
+                print('ServoError: Angle movement exceeds stop angle')
                 return
-        print('Angle movement exceeds servo limits')
+
+    else: # Algorithm for single incremental movement
+        if (checkServoLimits(incAngle)):
+            writeServoAngle(incAngle)
+            servoAngle = servoAngle + incAngle
 
 ## Check if an angle increment is within limtis
 def checkServoLimits(incAngle):
+    global servoAngle
     testAngle = servoAngle + incAngle
 
     if (testAngle > 0.0 and testAngle < 600.0):
-        return true
+        return True
     else:
-        return false
+        print('ServoError: Angle movement exceeds servo limits')
+        return False
 
 ## Write an angle to the servo via premade serial connection
 def writeServoAngle(angle):
-    ## Move relative amount
-    serIO.write("mr {}\n".format(angle * (51200.0 / 360.0)))
+    ## Move relative
+    toWrite = 'mr {}\n'.format(int(angle * 51200.0 / 360.0))
+    ## Servo only accepts UTF-8 encoding
+    toWrite.encode(encoding='UTF-8')
+
+    serIO.write(toWrite)
     serIO.flush()

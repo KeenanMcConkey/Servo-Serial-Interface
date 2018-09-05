@@ -1,8 +1,9 @@
 # Servo-Serial-Interface
 
-#### Interface for Serial Control of M Drive Servo Motor
+## Interface for Serial Control of M Drive Servo Motor
 
 ---
+
 ### Libraries
 
 #### PySerial
@@ -14,27 +15,42 @@ https://github.com/pyserial/pyserial
 https://github.com/pallets/flask
 
 ---
+
 ### Setup
+
+#### Mac:
+Install **Silicon Labs USB to UART Driver**
+
+Port `/dev/cu.SLAB_USBtoUART`
 
 ```
 FLASK_APP=SerialWebUI.py
 flask run
 ```
 
-#### Mac:
-Port `/dev/cu.SLAB_USBtoUART`
-
-Uses **Silicon Labs USB to UART Driver**
-#### Linux:
-Port `/dev/ttysUSB0`
-
 #### Windows:
 Port `COM9`
 
-### To-Do
-Add **homing** feature to start motor at 0
-
-Add current angle **feedback** to web interface
+```
+set FLASK_APP=SerialWebUI.py
+flask run
+```
 
 ---
+
+### To-Do
+Add **homing** feature to start servo at angle 0
+
+Add **angle feedback** to web interface
+
+Add **servo feedback** for continuous movement
+
+---
+
+### Issues
+
+Serial currently not working properly on Mac
+
+Continuous movement not working due to no feedback
+
 *Created by Keenan McConkey*

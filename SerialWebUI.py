@@ -3,15 +3,29 @@
 # Global variables
 servoAngle = 0.0
 
+# Check current platform and assign ports based on this
+import platform
+os = platform.system()
+
+if (os == 'Darwin'):
+    port = '/dev/cu.SLAB_USBtoUART'
+elif (os == 'Windows'):
+    port = 'COM9'
+elif (os == 'Linux'):
+    port = '/dev/ttysUSB0'
+else:
+    port = ''
+    print('Error: Unknown OS')
+
 # Create serial connection with Servo using PySerial
 import serial
 import io
 
-ser = serial.Serial('/dev/cu.SLAB_USBtoUART')
+ser = serial.Serial(port)
 print(" * Port: {}".format(ser.port))
 print(" * Baudrate: {}".format(ser.baudrate))
 serIO = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
-serIO.write("fd")
+serIO.write("fd") ## Reset servo to factory def
 
 # Create a web interface to take data from using Flask
 from flask import Flask, render_template, request, url_for
@@ -93,6 +107,8 @@ def checkServoLimits(incAngle):
     else:
         return false
 
+## Write an angle to the servo via premade serial connection
 def writeServoAngle(angle):
+    ## Move relative amount
     serIO.write("mr {}\n".format(angle * (51200.0 / 360.0)))
     serIO.flush()

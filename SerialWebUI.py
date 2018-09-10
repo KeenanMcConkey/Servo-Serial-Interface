@@ -37,7 +37,7 @@ serIO = io.TextIOWrapper(io.BufferedRWPair(ser, ser))
 
 ## Write to precreated IO object and flush
 def ioWrite(toWrite):
-    toWrite.encode(encoding='UTF-8') ## Servo only accepts UTF-8
+    toWrite.encode(encoding='ascii') ## Servo only accepts UTF-8
     serIO.write(toWrite)
     serIO.flush()
 
@@ -45,6 +45,7 @@ def ioWrite(toWrite):
 ioWrite('fd\r\n') ## Reset servo to factory defaults
 ioWrite('ma 0\r\n') ## Homing routine
 ioWrite('h\r\n') # Wait until task completes
+ioWrite('s1=1,0,0\r\n') # Make input 1 homing input
 
 # Create a web interface to take data from using Flask
 from flask import Flask, render_template, request, url_for
@@ -76,7 +77,7 @@ def handleIncremental():
         stopAngle = float(stopAngle)
 
     updateServoIncremental(cts, incAngle, stopAngle, delay)
-    return render_template('mdrive.html', currAngle=servoAngle)
+    return render_template('mdrive.html', currAngle=round(servoAngle,2))
 
 ## Specific form submission
 @app.route('/handleSpecific', methods=['POST'])

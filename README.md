@@ -41,7 +41,7 @@ Server is at localhost `127.0.0.1:5000`
 ### Issues
 1. Angle is reset every time server is restarted.  
 2. Sometimes current angle is displayed with too many decimal points.  
-3. Web interface is useless when serial is connected.
+3. Web interface does not respond when serial communication with motor is ongoing.
 
 ---
 
